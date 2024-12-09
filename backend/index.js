@@ -4,6 +4,7 @@ const cors = require("cors");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const OpenAI = require("openai");
+require("dotenv").config();
 
 const apiKey = process.env.OPEN_AI_KEY;
 
