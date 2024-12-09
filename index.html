@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grammar Checker</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        overflow-x: hidden;
+      }
+      input[type="text"] {
+        width: calc(100% - 150px);
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .ai_button {
+        background-color: #6002d2;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+      .ai_button:hover {
+        background-color: #6d05ec;
+      }
+      .grammer-section {
+        width: 70%;
+      }
+      .dictionary-section {
+        width: 30%;
+      }
+      footer {
+        position: fixed;
+        max-width: 100%;
+        min-width: 100%;
+        overflow: hidden;
+        bottom: 0;
+        text-align: center;
+        background-color: #f8f9fa;
+        padding: 22px;
+      }
+      .footer-text {
+        color: #333;
+      }
+
+      .suggestions-container {
+        position: relative;
+        margin-top: 22px;
+      }
+      .suggestions-dropdown {
+        position: relative;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        width: 100%;
+        max-height: 150px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        margin-top: 22px;
+      }
+      .suggestion-item {
+        padding: 5px;
+        cursor: pointer;
+      }
+      .suggestion-item:hover {
+        background-color: #f0f0f0;
+      }
+      .incorrect-word {
+        text-decoration: underline;
+        text-decoration-color: red;
+      }
+      .sug-button {
+        background-color: #6002d2;
+        border-radius: 12px;
+      }
+      #feedback {
+        margin-top: 22px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      style="
+        width: 100%;
+        padding: 22px;
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+      "
+    >
+      <div class="grammer-section">
+        <h1>Gramatika barlamak:</h1>
+        <br />
+        <form id="grammarCheckerForm">
+          <label for="sentence">Teksi giriziň:</label>
+          <div class="suggestions-container">
+            <input type="text" id="sentence" name="sentence" value="" />
+            <div
+              id="suggestionsDropdown"
+              class="suggestions-dropdown"
+              style="display: none"
+            ></div>
+          </div>
+
+          <button type="button" onclick="checkSentence()">Barlamak</button>
+          <button
+            type="button"
+            onclick="checkSentenceWithAi()"
+            class="ai_button"
+          >
+            Emeli aň kömegi bilen barla
+          </button>
+        </form>
+
+        <div id="feedback">
+          <ul id="feedbackList">
+            <!-- Suggestions will be listed here -->
+          </ul>
+        </div>
+      </div>
+
+      <div class="dictionary-section">
+        <h2>Sözleriň manysy</h2>
+        <ul id="dictionaryResults">
+          <!-- Word meanings will be dynamically inserted here -->
+        </ul>
+      </div>
+
+      <footer class="footer">
+        <span class="footer-text">
+          Programmany döreden: Pena Muhammetberdiýew
+        </span>
+      </footer>
+    </div>
+
+    <script>
+      async function checkSentence() {
+        const sentenceInput = document.getElementById("sentence");
+        const feedbackList = document.getElementById("feedbackList");
+        const suggestionsDropdown = document.getElementById(
+          "suggestionsDropdown"
+        );
+        feedbackList.innerHTML = ""; // Clear previous feedback
+        suggestionsDropdown.innerHTML = ""; // Clear suggestions dropdown
+
+        const sentence = sentenceInput.value;
+
+        const payload = {
+          text: sentence,
+        };
+
+        try {
+          const response = await fetch(
+            "http://localhost:3000/proxy/spellcheck",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(payload),
+            }
+          );
+
+          const data = await response.json();
+
+          const spellingMistakes = data.spellingMistakes || {};
+          let suggestionsList = [];
+
+          if (Object.keys(spellingMistakes).length) {
+            Object.keys(spellingMistakes).forEach((mistake) => {
+              const suggestedWords = spellingMistakes[mistake];
+              const originalWord = mistake;
+
+              if (suggestedWords.length) {
+                suggestionsList.push({
+                  word: originalWord,
+                  suggestions: suggestedWords,
+                });
+
+                // Display feedback with buttons for suggestions
+                const listItem = document.createElement("li");
+                listItem.innerHTML = `
+            <b>${originalWord}</b> -> ${suggestedWords
+                  .map(
+                    (suggestion, index) =>
+                      `<button class="sug-button" onclick="replaceWord('${originalWord}', '${suggestion}')">
+                  ${suggestion}
+                </button>`
+                  )
+                  .join(", ")}`;
+                feedbackList.appendChild(listItem);
+              }
+            });
+          } else {
+            feedbackList.innerHTML = "<li>No issues found.</li>";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          feedbackList.innerHTML =
+            "<li>There was an error checking the grammar.</li>";
+        }
+
+        getDictionaryData();
+      }
+
+      function replaceWord(oldWord, newWord) {
+        const sentenceInput = document.getElementById("sentence");
+        const updatedSentence = sentenceInput.value.replace(
+          new RegExp(`\\b${oldWord}\\b`, "g"),
+          newWord
+        );
+        sentenceInput.value = updatedSentence;
+
+        // Optionally, re-check the updated sentence for remaining errors
+        checkSentence();
+      }
+      async function getDictionaryData() {
+        const sentence = document.getElementById("sentence").value;
+        const words = sentence.split(" ").map((word) => word.trim());
+        const dictionaryResults = document.getElementById("dictionaryResults");
+
+        // Clear previous results
+        dictionaryResults.innerHTML = "";
+
+        try {
+          // Send POST request to the server
+          const response = await fetch("http://localhost:3000/get-word", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify([words]), // Wrap words in an array to match server `req.body`
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch word data");
+          }
+
+          // Parse the response data
+          const data = await response.json();
+
+          // Populate the dictionary section
+          data.forEach((item) => {
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `
+        <h4>${item.word}:</h4>
+        <p>${item.descriptions.join(", ")}</p>
+      `;
+            dictionaryResults.appendChild(listItem);
+          });
+        } catch (error) {
+          console.error("Error fetching dictionary data:", error);
+          dictionaryResults.innerHTML =
+            "<li>There was an error retrieving the data.</li>";
+        }
+      }
+    </script>
+    <script src="turkmen.js"></script>
+  </body>
+</html>
