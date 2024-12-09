@@ -13,7 +13,7 @@ const openai = new OpenAI({
 });
 
 const app = express();
-const port = 3000;
+const port = 3008;
 
 // Enable CORS to allow requests from your frontend
 app.use(cors());
