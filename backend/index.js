@@ -4,6 +4,7 @@ const cors = require("cors");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const OpenAI = require("openai");
+const path = require("path");
 require("dotenv").config();
 
 const apiKey = process.env.OPEN_AI_KEY;
@@ -18,6 +19,11 @@ const port = 3008;
 // Enable CORS to allow requests from your frontend
 app.use(cors());
 app.use(express.json()); // Middleware to parse JSON request body
+app.use(express.static(path.join(__dirname, "public")));
+
+app.get("/grammer", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
 app.get("/ai", async (req, res) => {
   const completion = await openai.chat.completions.create({
