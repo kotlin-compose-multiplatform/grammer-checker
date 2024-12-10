@@ -4,150 +4,184 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Grammar Checker</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      /* Base Styles */
       * {
         padding: 0;
         margin: 0;
+        box-sizing: border-box;
       }
+
       body {
-        font-family: Arial, sans-serif;
+        font-family: "Poppins", Arial, sans-serif;
+        line-height: 1.6;
+        background-color: #f4f4f9;
+        color: #333;
         overflow-x: hidden;
       }
+
+      h1,
+      h2 {
+        color: #6002d2;
+        margin-bottom: 20px;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+      /* Container Layout */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .grammer-section,
+      .dictionary-section {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .grammer-section {
+        flex: 2;
+        min-width: 300px;
+      }
+
+      .dictionary-section {
+        flex: 1;
+        min-width: 300px;
+      }
+
+      /* Form Styles */
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
       input[type="text"] {
-        width: calc(100% - 150px);
-        padding: 10px;
-        margin-bottom: 10px;
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
         border: 1px solid #ccc;
+        border-radius: 5px;
       }
+
       button {
-        background-color: #4caf50;
-        color: white;
+        padding: 12px 20px;
+        font-size: 16px;
         border: none;
-        padding: 10px 20px;
+        border-radius: 5px;
         cursor: pointer;
+        transition: background-color 0.3s ease;
       }
+
       button:hover {
-        background-color: #45a049;
+        opacity: 0.9;
       }
+
       .ai_button {
         background-color: #6002d2;
         color: white;
-        border: none;
-        padding: 10px 20px;
-        cursor: pointer;
-      }
-      .ai_button:hover {
-        background-color: #6d05ec;
-      }
-      .grammer-section {
-        width: 70%;
-      }
-      .dictionary-section {
-        width: 30%;
-      }
-      footer {
-        position: fixed;
-        max-width: 100%;
-        min-width: 100%;
-        overflow: hidden;
-        bottom: 0;
-        text-align: center;
-        background-color: #f8f9fa;
-        padding: 22px;
-      }
-      .footer-text {
-        color: #333;
       }
 
       .suggestions-container {
         position: relative;
-        margin-top: 22px;
+        margin-bottom: 20px;
       }
+
       .suggestions-dropdown {
-        position: relative;
-        background-color: #fff;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #fff;
         border: 1px solid #ccc;
-        width: 100%;
-        max-height: 150px;
-        overflow-y: auto;
+        border-radius: 5px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         z-index: 1000;
         display: none;
-        margin-top: 22px;
       }
+
       .suggestion-item {
-        padding: 5px;
+        padding: 10px;
         cursor: pointer;
       }
+
       .suggestion-item:hover {
         background-color: #f0f0f0;
       }
-      .incorrect-word {
-        text-decoration: underline;
-        text-decoration-color: red;
-      }
-      .sug-button {
+
+      .footer {
+        text-align: center;
         background-color: #6002d2;
-        border-radius: 12px;
+        color: #fff;
+        padding: 15px 10px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
       }
-      #feedback {
-        margin-top: 22px;
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+        }
+
+        .grammer-section,
+        .dictionary-section {
+          flex: 1;
+          margin-bottom: 20px;
+        }
       }
     </style>
   </head>
   <body>
-    <div
-      style="
-        width: 100%;
-        padding: 22px;
-        display: flex;
-        flex-direction: row;
-        gap: 12px;
-      "
-    >
+    <div class="container">
       <div class="grammer-section">
-        <h1>Gramatika barlamak:</h1>
-        <br />
+        <h1>Grammar Checker</h1>
         <form id="grammarCheckerForm">
-          <label for="sentence">Teksi giriziň:</label>
+          <label for="sentence">Enter a Sentence:</label>
           <div class="suggestions-container">
-            <input type="text" id="sentence" name="sentence" value="" />
-            <div
-              id="suggestionsDropdown"
-              class="suggestions-dropdown"
-              style="display: none"
-            ></div>
+            <input
+              type="text"
+              id="sentence"
+              name="sentence"
+              placeholder="Type your sentence here..."
+            />
+            <div id="suggestionsDropdown" class="suggestions-dropdown"></div>
           </div>
-
-          <button type="button" onclick="checkSentence()">Barlamak</button>
+          <button type="button" onclick="checkSentence()">Check</button>
           <button
             type="button"
             onclick="checkSentenceWithAi()"
             class="ai_button"
           >
-            Emeli aň kömegi bilen barla
+            Check with AI
           </button>
         </form>
-
         <div id="feedback">
-          <ul id="feedbackList">
-            <!-- Suggestions will be listed here -->
-          </ul>
+          <ul id="feedbackList"></ul>
         </div>
       </div>
 
       <div class="dictionary-section">
-        <h2>Sözleriň manysy</h2>
-        <ul id="dictionaryResults">
-          <!-- Word meanings will be dynamically inserted here -->
-        </ul>
+        <h2>Word Meanings</h2>
+        <ul id="dictionaryResults"></ul>
       </div>
-
-      <footer class="footer">
-        <span class="footer-text">
-          Programmany döreden: Pena Muhammetberdiýew
-        </span>
-      </footer>
     </div>
+
+    <footer class="footer">Created by Pena Muhammetberdiýew</footer>
 
     <script>
       async function checkSentence() {
