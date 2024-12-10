@@ -138,25 +138,25 @@
   <body>
     <div class="container">
       <div class="grammer-section">
-        <h1>Grammar Checker</h1>
+        <h1>Gramatika Barlaýjy</h1>
         <form id="grammarCheckerForm">
-          <label for="sentence">Enter a Sentence:</label>
+          <label for="sentence">Sözlem giriziň:</label>
           <div class="suggestions-container">
             <input
               type="text"
               id="sentence"
               name="sentence"
-              placeholder="Type your sentence here..."
+              placeholder="Sözlemiňizi şu ýere ýazyň..."
             />
             <div id="suggestionsDropdown" class="suggestions-dropdown"></div>
           </div>
-          <button type="button" onclick="checkSentence()">Check</button>
+          <button type="button" onclick="checkSentence()">Barla</button>
           <button
             type="button"
             onclick="checkSentenceWithAi()"
             class="ai_button"
           >
-            Check with AI
+            AI bilen Barla
           </button>
         </form>
         <div id="feedback">
@@ -165,12 +165,12 @@
       </div>
 
       <div class="dictionary-section">
-        <h2>Word Meanings</h2>
+        <h2>Söz Manylary</h2>
         <ul id="dictionaryResults"></ul>
       </div>
     </div>
 
-    <footer class="footer">Created by Pena Muhammetberdiýew</footer>
+    <footer class="footer">Pena Muhammetberdiýew tarapyndan döredilen</footer>
 
     <script>
       async function checkSentence() {
@@ -231,12 +231,11 @@
               }
             });
           } else {
-            feedbackList.innerHTML = "<li>No issues found.</li>";
+            feedbackList.innerHTML = "<li>Ýalňyşlyk tapylmady.</li>";
           }
         } catch (error) {
           console.error("Error:", error);
-          feedbackList.innerHTML =
-            "<li>There was an error checking the grammar.</li>";
+          feedbackList.innerHTML = "<li>Ýalňyşlyk ýüze çykdy.</li>";
         }
 
         getDictionaryData();
@@ -289,8 +288,7 @@
           });
         } catch (error) {
           console.error("Error fetching dictionary data:", error);
-          dictionaryResults.innerHTML =
-            "<li>There was an error retrieving the data.</li>";
+          dictionaryResults.innerHTML = "<li>Gaýtadan synanşyň.</li>";
         }
       }
     </script>

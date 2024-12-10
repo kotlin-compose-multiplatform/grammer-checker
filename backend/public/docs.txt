@@ -1,0 +1,75 @@
+1. UI Construction
+HTML Structure
+
+Page Header:
+The <head> section defines the page's metadata, imports the "Poppins" font from Google Fonts, and includes inline CSS for styling.
+The <title> specifies the page title as "Grammar Checker."
+Body Layout:
+Contains a div with the container class that houses two main sections:
+Grammar Checker Section (grammer-section):
+Includes a heading (h1) labeled "Gramatika Barlaýjy."
+Features a form where users input a sentence, triggering grammar checks via two buttons:
+Barla (Simple Check)
+AI bilen Barla (AI-based Check).
+Displays feedback dynamically via an unordered list (ul#feedbackList).
+Dictionary Section (dictionary-section):
+Displays a heading (h2) for "Söz Manylary" (Word Meanings).
+Uses an unordered list (ul#dictionaryResults) to dynamically populate dictionary meanings for words in the input sentence.
+Footer:
+Includes a fixed footer at the bottom with attribution text, "Pena Muhammetberdiýew tarapyndan döredilen."
+2. Styling
+Base Styles:
+
+Applies global reset styles (e.g., padding: 0; margin: 0;) for consistency.
+Sets a font family of "Poppins" and a gradient background animation for a visually appealing design.
+Container and Section Layout:
+
+Container (.container):
+Defines a responsive flexbox layout for proper alignment of sections.
+Ensures gaps between sections and wraps content for smaller screens.
+Grammar Checker and Dictionary Sections:
+Use rounded borders (border-radius: 10px) and subtle shadows (box-shadow) for a card-like appearance.
+Apply a white background with slight transparency (rgba(255, 255, 255, 0.9)) for contrast.
+Interactive Elements:
+
+Form Inputs:
+Styled with padding, rounded borders, and a clear font for readability.
+Buttons:
+Include hover effects (opacity: 0.9) and distinctive styles for the AI-specific button (.ai_button).
+Responsive Design:
+
+Adapts the layout for smaller screens with media queries, stacking sections vertically.
+3. Functionality
+Grammar Checker Logic (checkSentence):
+
+Input Handling:
+Retrieves user input from the sentence text field.
+API Interaction:
+Sends a POST request to a grammar-checking endpoint (/proxy/spellcheck).
+Parses the JSON response to extract and display spelling mistakes along with suggestions.
+Error Suggestions:
+Dynamically populates feedbackList with buttons for suggested corrections.
+Suggestion buttons replace the incorrect word with the selected alternative in the input field.
+Word Replacement (replaceWord):
+
+Uses JavaScript's RegExp to replace incorrect words globally in the sentence.
+Automatically rechecks the updated sentence.
+Dictionary Data Retrieval (getDictionaryData):
+
+Splits the input sentence into individual words.
+Sends a POST request to the /get-word endpoint, passing the words as a JSON array.
+Dynamically updates the dictionaryResults list with meanings fetched from the response.
+Error Handling:
+
+Provides feedback (<li>Gaýtadan synanşyň.</li>) in case of API failures or connectivity issues.
+4. Development Process
+Design Philosophy:
+Emphasizes usability and visual clarity.
+Uses modern CSS techniques like animations and responsive design for aesthetic appeal.
+Functionality Implementation:
+JavaScript functions are modular, focusing on specific tasks (e.g., checkSentence, replaceWord).
+Error handling ensures graceful degradation when APIs are unavailable.
+User Interaction:
+Provides real-time feedback and interaction, improving user engagement (e.g., dynamic suggestion buttons).
+Extensibility:
+Allows for further enhancements, such as integrating additional features (e.g., multilingual support or advanced AI checks).
