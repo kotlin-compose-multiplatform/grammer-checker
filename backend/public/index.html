@@ -173,6 +173,7 @@
     <footer class="footer">Pena Muhammetberdiýew tarapyndan döredilen</footer>
 
     <script>
+      const baseUrl = "http://localhost:3008";
       async function checkSentence() {
         const sentenceInput = document.getElementById("sentence");
         const feedbackList = document.getElementById("feedbackList");
@@ -189,16 +190,13 @@
         };
 
         try {
-          const response = await fetch(
-            "http://216.250.8.128:3008/proxy/spellcheck",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(payload),
-            }
-          );
+          const response = await fetch(baseUrl + "/proxy/spellcheck", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
 
           const data = await response.json();
 
@@ -262,7 +260,7 @@
 
         try {
           // Send POST request to the server
-          const response = await fetch("http://216.250.8.128:3008/get-word", {
+          const response = await fetch(baseUrl + "/get-word", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

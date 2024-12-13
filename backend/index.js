@@ -6,6 +6,7 @@ const { JSDOM } = jsdom;
 const OpenAI = require("openai");
 const path = require("path");
 require("dotenv").config();
+const { parseString } = require("xml2js");
 
 const apiKey = process.env.OPEN_AI_KEY;
 
@@ -101,35 +102,66 @@ app.post("/get-word", async (req, res) => {
   // Iterate over the words and process them
   for (let i = 0; i < words.length; i++) {
     const word = words[i];
-    try {
-      const data = await extractWordData(
-        `https://enedilim.com/sozluk/soz/${word}`
-      );
-      if (data) {
+
+    await axios
+      .get("https://enedilim.com/sozluk/soz/" + word, {
+        headers: {
+          Accept: "application/vnd.enedilim.v3+xml",
+        },
+      })
+      .then((response) => {
+        if (response.status >= 200 && response.status < 300) {
+          parseString(response.data, function (err, rss) {
+            // parsing to json
+            let data = rss;
+
+            // display the json data
+            console.log("results", data);
+            results.push({
+              word: word,
+              descriptions:
+                data.wordList.wordItem[0].defItem.map(
+                  (it) =>
+                    `${it.def}\n${
+                      it.example
+                        ? it.example.map(
+                            (v) =>
+                              `<h4>${v["_"]}</h4>\n<p>${v["$"]["source"]}</p><br/>`
+                          )
+                        : "<br/>"
+                    }<br/>`
+                ) || [],
+              examples: data || [],
+            });
+            if (i == words.length - 1) {
+              res.json(results);
+            }
+          });
+        } else {
+          results.push({
+            word: word,
+            descriptions: ["Tapylmady"],
+            examples: [],
+          });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
         results.push({
           word: word,
-          descriptions: data.descriptions || [],
-          examples: data.examples || [],
-        });
-      } else {
-        results.push({
-          word: word,
-          descriptions: ["No data found"],
+          descriptions: ["Tapylmady"],
           examples: [],
         });
-      }
-    } catch (error) {
-      console.error(`Error processing word "${word}":`, error);
-      results.push({
-        word: word,
-        descriptions: ["Error fetching data"],
-        examples: [],
       });
-    }
+  }
+
+  if (results.length == 0) {
+    res.send("Tapylmady");
+  } else {
+    res.json(results);
   }
 
   // Send the aggregated results back to the client
-  res.json(results);
 });
 
 // Start the server
