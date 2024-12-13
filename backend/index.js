@@ -146,7 +146,6 @@ app.post("/get-word", async (req, res) => {
         }
       })
       .catch((err) => {
-        console.error(err);
         results.push({
           word: word,
           descriptions: ["Tapylmady"],
